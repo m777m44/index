@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub  بحث عن مشاريع في </title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin-top: 50px;
+            color: #333;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 320px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid #4CAF50;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            display: none;
+        }
+        .project {
+            text-align: left;
+            padding: 15px;
+            background-color: #e9f7df;
+            margin: 20px 0;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        .project:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .project h3 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+        }
+        .project p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        #loading {
+            display: none;
+            font-size: 18px;
+            color: #4CAF50;
+        }
+        .details {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .details span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .download-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GitHub  بحث عن مشاريع في </h1>
+    <label for="query">أدخل استفسارك للبحث عن المشاريع:</label><br><br>
+    <input type="text" id="query" placeholder="مثل : Python">
+    <button onclick="searchProjects()">بحث</button>
+
+    <div id="loading">جاري البحث...</div>
+    
+    <div class="response" id="response">
+        <h2>المشاريع:</h2>
+        <div id="projects-list"></div>
+    </div>
+
+    <script>
+        let allProjectsData = []; // لتخزين البيانات لجميع المشاريع
+
+        // دالة البحث عن المشاريع في GitHub
+        async function searchProjects() {
+            const query = document.getElementById("query").value;
+            const responseDiv = document.getElementById("response");
+            const projectsListDiv = document.getElementById("projects-list");
+            const loadingDiv = document.getElementById("loading");
+
+            if (!query) {
+                alert("الرجاء إدخال استفسار.");
+                return;
+            }
+
+            loadingDiv.style.display = 'block'; // إظهار مؤشر التحميل
+            responseDiv.style.display = 'none'; // إخفاء النتائج السابقة
+
+            try {
+                // استعلام GitHub API للبحث عن المشاريع
+                const githubResponse = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc`, {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0'
+                    }
+                });
+
+                const data = await githubResponse.json();
+                const projects = data.items || [];
+
+                if (projects.length === 0) {
+                    responseDiv.style.display = 'none';
+                    alert("لم يتم العثور على مشاريع.");
+                    loadingDiv.style.display = 'none'; // إخفاء مؤشر التحميل
+                    return;
+                }
+
+                allProjectsData = projects; // تخزين بيانات المشاريع
+
+                // عرض النتائج في الصفحة
+                projectsListDiv.innerHTML = ""; // مسح النتائج السابقة
+
+                for (const project of projects) {
+                    const projectDiv = document.createElement("div");
+                    projectDiv.classList.add("project");
+
+                    // تحويل تاريخ النشر و آخر تعديل إلى صيغة قابلة للقراءة
+                    const createdAt = new Date(project.created_at).toLocaleDateString('ar-EG');
+                    const updatedAt = new Date(project.updated_at).toLocaleDateString('ar-EG');
+
+                    // فحص ما إذا كان المشروع يحتوي على بوتات أو أكواد مشفرة أو مغلق المصدر
+                    const isBot = project.description && project.description.toLowerCase().includes("bot");
+                    const isEncrypted = project.description && project.description.toLowerCase().includes("encrypted");
+                    const isClosedSource = !project.license || project.license.spdx_id === "NOASSERTION"; // مفتوح أو مغلق
+
+                    // الحصول على اسم الفرع الرئيسي
+                    const branchResponse = await fetch(`https://api.github.com/repos/${project.owner.login}/${project.name}/branches`);
+                    const branches = await branchResponse.json();
+                    const defaultBranch = branches.find(branch => branch.name === project.default_branch) || branches[0];
+                    const defaultBranchName = defaultBranch ? defaultBranch.name : 'main';
+
+                    projectDiv.innerHTML = `
+                        <h3>${project.name}</h3>
+                        <div class="details">
+                            <p><span>الوصف:</span> ${project.description || 'لا يوجد وصف'} </p>
+                            <p><span>اللغة البرمجية:</span> ${project.language || 'غير محدد'}</p>
+                            <p><span>عدد النجوم:</span> ${project.stargazers_count}</p>
+                            <p><span>عدد الفروع:</span> ${project.forks_count}</p>
+                            <p><span>عدد المشاكل المفتوحة:</span> ${project.open_issues_count}</p>
+                            <p><span>تاريخ النشر:</span> ${createdAt}</p>
+                            <p><span>آخر تعديل:</span> ${updatedAt}</p>
+                            <p><span>المطور:</span> <a href="https://github.com/${project.owner.login}" target="_blank">${project.owner.login}</a></p>
+                            <p><span>معرف المطور:</span> ${project.owner.id}</p>
+                            <p><span>البوتات:</span> ${isBot ? 'نعم' : 'لا'}</p>
+                            <p><span>التشفير:</span> ${isEncrypted ? 'نعم' : 'لا'}</p>
+                            <p><span>مفتوح المصدر:</span> ${isClosedSource ? 'مغلق' : 'مفتوح'}</p>
+                        </div>
+                        <a href="${project.html_url}" target="_blank" class="download-button">رابط المشروع</a>
+                        <a href="https://github.com/${project.owner.login}/${project.name}/archive/refs/heads/${defaultBranchName}.zip" class="download-button" target="_blank">تحميل المشروع</a>
+                    `;
+                    projectsListDiv.appendChild(projectDiv);
+                }
+
+                responseDiv.style.display = 'block'; // إظهار النتائج
+                loadingDiv.style.display = 'none'; // إخفاء مؤشر التحميل
+
+            } catch (error) {
+                alert("حدث خطأ أثناء الاتصال بـ GitHub.");
+                console.error(error);
+                loadingDiv.style.display = 'none'; // إخفاء مؤشر التحميل
+            }
+        }
+    </script>
+
+</body>
+</html>
