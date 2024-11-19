@@ -5,218 +5,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بحث عن مشاريع GitHub</title>
     <style>
-        /* الخطوط */
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
-
-        /* الإعدادات العامة */
         :root {
-            --background-color: #f3f4f6;
+            --background-color: #f4f4f4;
             --text-color: #333;
-            --card-background: #fff;
-            --button-background: #4CAF50;
-            --button-hover: #45a049;
-            --link-color: #007bff;
+            --button-color: #4CAF50;
+            --button-hover-color: #45a049;
+            --card-background-color: #e9f7df;
+            --details-background-color: #f9f9f9;
         }
 
         [data-theme="dark"] {
-            --background-color: #181818;
-            --text-color: #f0f0f0;
-            --card-background: #242424;
-            --button-background: #007bff;
-            --button-hover: #0056b3;
-            --link-color: #4CAF50;
+            --background-color: #121212;
+            --text-color: #f4f4f4;
+            --button-color: #1e88e5;
+            --button-hover-color: #1565c0;
+            --card-background-color: #1e1e1e;
+            --details-background-color: #242424;
         }
 
-        /* الجسم */
         body {
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: var(--background-color);
-            color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
-        }
-
-        /* العنوان */
-        h1 {
+            font-family: 'Arial', sans-serif;
             text-align: center;
-            margin-top: 20px;
-            font-size: 2.5rem;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin-top: 50px;
         }
 
-        /* المدخلات */
         input[type="text"] {
-            width: 60%;
-            padding: 15px;
-            border: 2px solid var(--button-background);
-            border-radius: 30px;
-            margin: 20px 0;
-            font-size: 1.2rem;
-            outline: none;
-            transition: 0.3s;
+            padding: 10px;
+            width: 320px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--button-color);
+            font-size: 16px;
         }
 
-        input[type="text"]:focus {
-            border-color: var(--button-hover);
-            box-shadow: 0 0 10px rgba(0, 150, 50, 0.5);
-        }
-
-        /* الأزرار */
         button {
-            padding: 15px 30px;
-            background: var(--button-background);
-            color: #fff;
+            padding: 12px 20px;
+            background-color: var(--button-color);
+            color: var(--text-color);
             border: none;
-            border-radius: 30px;
-            font-size: 1.2rem;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 16px;
         }
 
         button:hover {
-            background: var(--button-hover);
-            box-shadow: 0 5px 15px rgba(0, 150, 50, 0.3);
+            background-color: var(--button-hover-color);
         }
 
-        /* زر الوضع */
-        .toggle-mode {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border: none;
-            background: var(--button-background);
-            color: white;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        /* كرت المشروع */
-        .project {
+        .response {
+            margin-top: 30px;
             padding: 20px;
-            margin: 20px auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 15px;
-            background: var(--card-background);
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: var(--card-background-color);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .project {
+            text-align: left;
+            padding: 15px;
+            background-color: var(--details-background-color);
+            margin: 20px 0;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
         }
 
         .project:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .project h3 {
-            margin-bottom: 10px;
+            margin: 0;
             color: var(--text-color);
+            font-size: 20px;
         }
 
-        .project a {
-            display: inline-block;
-            margin-top: 10px;
+        .project p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .download-button {
             padding: 10px 20px;
-            background: var(--button-background);
-            color: #fff;
+            background-color: var(--button-color);
+            color: white;
             text-decoration: none;
-            border-radius: 20px;
-            font-size: 1rem;
-            transition: 0.3s;
+            border-radius: 8px;
+            margin-top: 10px;
+            align-self: flex-start;
         }
 
-        .project a:hover {
-            background: var(--button-hover);
-            box-shadow: 0 5px 15px rgba(0, 0, 255, 0.3);
+        .toggle-theme,
+        .toggle-language {
+            position: fixed;
+            top: 20px;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 8px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .toggle-theme {
+            left: 20px; /* وضع الزر في أقصى اليسار */
+        }
+
+        .toggle-language {
+            right: 20px; /* وضع الزر في أقصى اليمين */
         }
     </style>
 </head>
-<body data-theme="light">
+<body>
 
-    <!-- زر تغيير الوضع -->
-    <button class="toggle-mode" onclick="toggleMode()">وضع الظلام</button>
+    <button class="toggle-theme" onclick="toggleTheme()">تبديل الوضع</button>
+    <button class="toggle-language" onclick="toggleLanguage()">Switch Language</button>
 
-    <h1>بحث عن مشاريع GitHub</h1>
-    <div style="text-align:center;">
-        <input type="text" id="query" placeholder="مثال: JavaScript أو Machine Learning">
-        <button onclick="searchProjects()">بحث</button>
-    </div>
+    <h1 id="title">بحث عن مشاريع GitHub</h1>
+    <label for="query" id="search-label">أدخل استفسارك للبحث عن المشاريع:</label><br><br>
+    <input type="text" id="query" placeholder="مثل: Laravel">
+    <button onclick="searchProjects()" id="search-button">بحث</button>
 
-    <div id="loading" style="display:none; text-align:center;">جاري البحث...</div>
-
-    <div id="response" class="response" style="display:none;">
-        <h2 style="text-align:center;">نتائج البحث</h2>
+    <div id="loading" style="display:none;">جاري البحث...</div>
+    
+    <div class="response" id="response">
+        <h2 id="projects-title">المشاريع:</h2>
         <div id="projects-list"></div>
     </div>
 
     <script>
-        // تفعيل الوضع الداكن/الضوء
-        function toggleMode() {
-            const currentTheme = document.body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.body.setAttribute('data-theme', newTheme);
-
-            // تحديث نص الزر
-            document.querySelector('.toggle-mode').innerText = newTheme === 'light' ? 'وضع الظلام' : 'وضع الضوء';
-
-            // حفظ التفضيل في localStorage
-            localStorage.setItem('theme', newTheme);
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            document.body.setAttribute("data-theme", newTheme);
         }
 
-        // التحقق من الوضع المخزن في localStorage
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
+        let currentLanguage = 'ar';
 
-            // تحديث نص الزر
-            document.querySelector('.toggle-mode').innerText = savedTheme === 'light' ? 'وضع الظلام' : 'وضع الضوء';
-        });
+        function toggleLanguage() {
+            if (currentLanguage === 'ar') {
+                currentLanguage = 'en';
+                document.getElementById("title").innerText = "GitHub Projects Search";
+                document.getElementById("search-label").innerText = "Enter your query to search for projects:";
+                document.getElementById("search-button").innerText = "Search";
+                document.getElementById("projects-title").innerText = "Projects:";
+                document.querySelector('.toggle-language').innerText = "تبديل اللغة";
+            } else {
+                currentLanguage = 'ar';
+                document.getElementById("title").innerText = "بحث عن مشاريع GitHub";
+                document.getElementById("search-label").innerText = "أدخل استفسارك للبحث عن المشاريع:";
+                document.getElementById("search-button").innerText = "بحث";
+                document.getElementById("projects-title").innerText = "المشاريع:";
+                document.querySelector('.toggle-language').innerText = "Switch Language";
+            }
+        }
 
-        // دالة البحث
         async function searchProjects() {
-            const query = document.getElementById("query").value.trim();
+            const query = document.getElementById("query").value;
+            const responseDiv = document.getElementById("response");
+            const projectsListDiv = document.getElementById("projects-list");
+            const loadingDiv = document.getElementById("loading");
+
             if (!query) {
-                alert("يرجى إدخال كلمة بحث!");
+                alert("الرجاء إدخال استفسار.");
                 return;
             }
 
-            const loadingDiv = document.getElementById("loading");
-            const responseDiv = document.getElementById("response");
-            const projectsListDiv = document.getElementById("projects-list");
-
-            loadingDiv.style.display = "block";
-            responseDiv.style.display = "none";
+            loadingDiv.style.display = 'block'; 
+            responseDiv.style.display = 'none'; 
 
             try {
-                const res = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc`);
-                const data = await res.json();
+                const githubResponse = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc`);
+                const data = await githubResponse.json();
+                const projects = data.items || [];
 
-                if (!data.items || data.items.length === 0) {
-                    projectsListDiv.innerHTML = '<p style="text-align:center;">لم يتم العثور على مشاريع.</p>';
-                    responseDiv.style.display = "block";
+                if (projects.length === 0) {
+                    alert("لم يتم العثور على مشاريع.");
+                    loadingDiv.style.display = 'none';
                     return;
                 }
 
                 projectsListDiv.innerHTML = "";
-                data.items.forEach(project => {
-                    const projectDiv = `
-                        <div class="project">
-                            <h3>${project.name}</h3>
-                            <p>الوصف: ${project.description || 'لا يوجد وصف'}</p>
-                            <a href="${project.html_url}" target="_blank">عرض المشروع</a>
-                        </div>
-                    `;
-                    projectsListDiv.innerHTML += projectDiv;
-                });
 
-                responseDiv.style.display = "block";
+                for (const project of projects) {
+                    const projectDiv = document.createElement("div");
+                    projectDiv.classList.add("project");
+
+                    const defaultBranchName = project.default_branch || "main";
+
+                    // استخراج تاريخ النشر وآخر تعديل مع الأرقام الإنجليزية
+                    const createdAt = new Date(project.created_at).toLocaleDateString("en-US");
+                    const updatedAt = new Date(project.updated_at).toLocaleDateString("en-US");
+
+                    projectDiv.innerHTML = `
+                        <h3>${project.name}</h3>
+                        <div class="details">
+                            <p><span>الوصف:</span> ${project.description || 'لا يوجد وصف'} </p>
+                            <p><span>اللغة البرمجية:</span> ${project.language || 'غير محدد'}</p>
+                            <p><span>عدد النجوم:</span> ${project.stargazers_count}</p>
+                            <p><span>عدد الفروع:</span> ${project.forks_count}</p>
+                            <p><span>عدد المشاكل المفتوحة:</span> ${project.open_issues_count}</p>
+                            <p><span>تاريخ النشر:</span> ${createdAt}</p>
+                            <p><span>آخر تعديل:</span> ${updatedAt}</p>
+                            <p><span>المطور:</span> <a href="https://github.com/${project.owner.login}" target="_blank">${project.owner.login}</a></p>
+                            <p><span>رابط المشروع:</span> <a href="https://github.com/${project.owner.login}/${project.name}" target="_blank">${project.name}</a></p>
+                        </div>
+                        <a href="https://github.com/${project.owner.login}/${project.name}/archive/refs/heads/${defaultBranchName}.zip" class="download-button" target="_blank">تحميل المشروع</a>
+                    `;
+
+                    projectsListDiv.appendChild(projectDiv);
+                }
+
+                responseDiv.style.display = 'block';
+                loadingDiv.style.display = 'none';
+
             } catch (error) {
-                alert("حدث خطأ أثناء البحث.");
+                alert("حدث خطأ أثناء الاتصال بـ GitHub.");
                 console.error(error);
-            } finally {
-                loadingDiv.style.display = "none";
+                loadingDiv.style.display = 'none';
             }
         }
     </script>
