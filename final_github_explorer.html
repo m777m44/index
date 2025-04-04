@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مستكشف مشاريع GitHub المطور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --background-color: rgba(0, 0, 0, 0.7);
+            --text-color: #ff0000;
+            --button-color: #8B0000;
+            --button-hover-color: #ff0000;
+            --card-background-color: rgba(20, 20, 20, 0.8);
+            --details-background-color: rgba(30, 30, 30, 0.9);
+            --shadow-color: rgba(255, 0, 0, 0.3);
+            --input-border-color: #8B0000;
+            --input-focus-border-color: #ff0000;
+            --glow-effect: 0 0 10px #ff0000;
+        }
+
+        [data-theme="light"] {
+            --background-color: rgba(0, 0, 0, 0.7);
+            --text-color: #ff0000;
+            --button-color: #8B0000;
+            --button-hover-color: #ff0000;
+            --card-background-color: rgba(20, 20, 20, 0.8);
+            --details-background-color: rgba(30, 30, 30, 0.9);
+            --shadow-color: rgba(255, 0, 0, 0.3);
+            --input-border-color: #8B0000;
+            --input-focus-border-color: #ff0000;
+            --glow-effect: 0 0 10px #ff0000;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            text-shadow: 0 0 5px var(--text-color);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            transition: color 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: textPulse 2s infinite;
+        }
+
+        @keyframes textPulse {
+            0% { text-shadow: 0 0 5px var(--text-color); }
+            50% { text-shadow: 0 0 20px var(--text-color); }
+            100% { text-shadow: 0 0 5px var(--text-color); }
+        }
+
+        input[type="text"], select {
+            padding: 12px;
+            width: calc(320px - 20px);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--input-border-color);
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        input::placeholder, select::placeholder {
+            color: rgba(255, 0, 0, 0.6);
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--input-focus-border-color);
+            outline: none;
+            box-shadow: var(--glow-effect);
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover:before {
+            left: 100%;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-color);
+            transform: scale(1.05);
+            box-shadow: var(--glow-effect);
+        }
+
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--card-background-color);
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            max-width: 100%;
+            overflow-y: auto;
+            transition: all 0.3s;
+            border: 1px solid var(--input-border-color);
+        }
+
+        .project {
+            text-align: right;
+            padding: 15px;
+            background-color: var(--details-background-color);
+            margin: 20px 0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            cursor: pointer;
+            border: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .project:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px var(--shadow-color);
+            border-color: var(--input-focus-border-color);
+        }
+
+        .project h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 20px;
+        }
+
+        .project p {
+            font-size: 16px;
+            margin: 8px 0;
+            text-align: right;
+        }
+
+       .details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: right;
+        }
+        .details p strong {
+            margin-left: 5px;
+        }
+
+        .download-button {
+            padding: 10px 20px;
+            background-color: var(--button-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 10px;
+            align-self: flex-start;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .download-button:hover:before {
+            left: 100%;
+        }
+
+        .download-button:hover {
+            background-color: var(--button-hover-color);
+            box-shadow: var(--glow-effect);
+        }
+
+        .toggle-theme,
+        .toggle-language {
+            position: fixed;
+            top: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+
+        .toggle-theme:hover,
+        .toggle-language:hover {
+            background-color: var(--button-hover-color);
+            box-shadow: var(--glow-effect);
+        }
+
+        .toggle-theme {
+            left: 20px;
+        }
+
+        .toggle-language {
+            right: 20px;
+        }
+
+        #loading {
+            display: none;
+            font-size: 18px;
+            color: var(--text-color);
+            margin-top: 20px;
+            text-shadow: var(--glow-effect);
+        }
+
+        .loading-animation {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 20px;
+        }
+        
+        .loading-animation div {
+            position: absolute;
+            top: 0;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--text-color);
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+        
+        .loading-animation div:nth-child(1) {
+            left: 8px;
+            animation: loading1 0.6s infinite;
+        }
+        
+        .loading-animation div:nth-child(2) {
+            left: 8px;
+            animation: loading2 0.6s infinite;
+        }
+        
+        .loading-animation div:nth-child(3) {
+            left: 32px;
+            animation: loading2 0.6s infinite;
+        }
+        
+        .loading-animation div:nth-child(4) {
+            left: 56px;
+            animation: loading3 0.6s infinite;
+        }
+        
+        @keyframes loading1 {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes loading3 {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+        
+        @keyframes loading2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(24px, 0); }
+        }
+
+        .filter-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-container select {
+            width: 150px;
+            margin: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--text-color);
+            border: 2px solid var(--input-border-color);
+        }
+
+        .filter-container select:focus {
+            border-color: var(--input-focus-border-color);
+            box-shadow: var(--glow-effect);
+        }
+
+        .language-select {
+            margin-top: 20px;
+        }
+
+        .project-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--input-border-color);
+            transition: all 0.3s;
+            filter: hue-rotate(320deg) saturate(1.5);
+        }
+
+        .project:hover .project-img {
+            border-color: var(--input-focus-border-color);
+            box-shadow: var(--glow-effect);
+        }
+
+        .no-results {
+            font-size: 1.2em;
+            color: var(--text-color);
+            margin-top: 20px;
+            text-shadow: var(--glow-effect);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: var(--button-hover-color);
+            box-shadow: var(--glow-effect);
+        }
+
+        .pagination button:disabled {
+            background-color: #550000;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .project-container{
+             display: flex;
+             flex-direction: row;
+             gap: 15px;
+             align-items: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--details-background-color);
+            margin: 15% auto;
+            padding: 25px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 700px;
+            position: relative;
+            text-align: right;
+            border: 1px solid var(--input-border-color);
+            box-shadow: 0 0 25px var(--shadow-color);
+            animation: modalFadeIn 0.4s;
+        }
+        
+        @keyframes modalFadeIn {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .modal-content h2 {
+            color: var(--text-color);
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px var(--text-color);
+        }
+        
+        .modal-content p {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .modal-content a {
+            color: #ff3333;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .modal-content a:hover {
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .close {
+            color: #8B0000;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        
+        /* Glitch effect for title */
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #00ffff;
+            animation: glitch-animation 3s infinite linear alternate-reverse;
+            clip: rect(44px, 450px, 56px, 0);
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #ff00ff;
+            animation: glitch-animation2 2s infinite linear alternate-reverse;
+            clip: rect(24px, 450px, 36px, 0);
+        }
+        
+        @keyframes glitch-animation {
+            0% { clip: rect(24px, 450px, 34px, 0); }
+            20% { clip: rect(62px, 450px, 84px, 0); }
+            40% { clip: rect(12px, 450px, 22px, 0); }
+            60% { clip: rect(54px, 450px, 73px, 0); }
+            80% { clip: rect(78px, 450px, 86px, 0); }
+            100% { clip: rect(35px, 450px, 59px, 0); }
+        }
+        
+        @keyframes glitch-animation2 {
+            0% { clip: rect(17px, 450px, 38px, 0); }
+            20% { clip: rect(59px, 450px, 98px, 0); }
+            40% { clip: rect(41px, 450px, 73px, 0); }
+            60% { clip: rect(10px, 450px, 33px, 0); }
+            80% { clip: rect(37px, 450px, 56px, 0); }
+            100% { clip: rect(89px, 450px, 99px, 0); }
+        }
+        
+        /* Stats section */
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background-color: var(--details-background-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 150px;
+            border: 1px solid var(--input-border-color);
+            transition: all 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow-effect);
+            border-color: var(--input-focus-border-color);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Trending section */
+        .trending-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: var(--card-background-color);
+            border-radius: 10px;
+            border: 1px solid var(--input-border-color);
+        }
+        
+        .trending-title {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-shadow: 0 0 5px var(--text-color);
+        }
+        
+        .trending-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--button-color) var(--details-background-color);
+        }
+        
+        .trending-list::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .trending-list::-webkit-scrollbar-track {
+            background: var(--details-background-color);
+            border-radius: 4px;
+        }
+        
+        .trending-list::-webkit-scrollbar-thumb {
+            background-color: var(--button-color);
+            border-radius: 4px;
+        }
+        
+        .trending-item {
+            min-width: 200px;
+            padding: 15px;
+            background-color: var(--details-background-color);
+            border-radius: 8px;
+            border: 1px solid var(--input-border-color);
+            transition: all 0.3s;
+        }
+        
+        .trending-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow-effect);
+            border-color: var(--input-focus-border-color);
+        }
+        
+        .trending-name {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .trending-stars {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        /* Custom scrollbar for the whole page */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--button-color);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--button-hover-color);
+        }
+        
+        /* Notification styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            width: 300px;
+        }
+        
+        .notification {
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+            border: 1px solid var(--input-border-color);
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.info {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-left: 5px solid #1e88e5;
+        }
+        
+        .notification.success {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-left: 5px solid #43a047;
+        }
+        
+        .notification.warning {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-left: 5px solid #fb8c00;
+        }
+        
+        .notification.error {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-left: 5px solid #e53935;
+        }
+        
+        .notification-close {
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        
+        /* Voice command button */
+        .voice-command-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--button-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-command-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+        }
+        
+        .voice-command-btn.active {
+            background-color: #e53935;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(229, 57, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+        }
+        
+        /* Shortcuts and commands lists */
+        .shortcuts-list, .voice-commands-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .shortcut-item, .command-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            border: 1px solid var(--input-border-color);
+        }
+        
+        .shortcut-key, .command-phrase {
+            background-color: var(--button-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        /* Blood effects */
+        .blood-splatter {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .blood-drip-effect {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        @keyframes drip {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(50px); opacity: 0; }
+        }
+        
+        /* Typing cursor */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background-color: #ff0000;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-theme" onclick="toggleTheme()">تبديل الوضع</button>
+    <button class="toggle-language" onclick="toggleLanguage()">Switch Language</button>
+
+    <h1 id="title" class="glitch" data-text="مستكشف مشاريع GitHub">مستكشف مشاريع GitHub</h1>
+    
+    <div class="stats-container" id="stats-container">
+        <!-- Stats will be populated here -->
+    </div>
+    
+    <label for="query" id="search-label">أدخل استفسارك للبحث عن المشاريع:</label><br><br>
+    <input type="text" id="query" placeholder="مثال: Laravel">
+
+    <div class="filter-container">
+        <select id="language-filter">
+            <option value="">اختر لغة</option>
+        </select>
+        <select id="stars-filter">
+            <option value="">عدد النجوم</option>
+            <option value="1">1+</option>
+            <option value="50">50+</option>
+            <option value="100">100+</option>
+            <option value="500">500+</option>
+            <option value="1000">1000+</option>
+            <option value="10000">10000+</option>
+        </select>
+        <select id="sort-filter">
+            <option value="stars">الأكثر نجومًا</option>
+            <option value="updated">آخر تحديث</option>
+            <option value="forks">الأكثر تفرعًا</option>
+            <option value="help-wanted-issues">مشاريع تحتاج مساعدة</option>
+            <option value="best-match">الأكثر ملاءمة</option>
+        </select>
+        <select id="order-filter">
+            <option value="desc">تنازلي</option>
+            <option value="asc">تصاعدي</option>
+        </select>
+    </div>
+
+    <button onclick="searchProjects()" id="search-button">بحث</button>
+
+    <div id="loading">
+        جاري البحث...
+        <div class="loading-animation">
+            <div></div><div></div><div></div><div></div>
+        </div>
+    </div>
+    
+    <div class="trending-section" id="trending-section">
+        <h2 class="trending-title" id="trending-title">المشاريع الشائعة</h2>
+        <div class="trending-list" id="trending-list">
+            <!-- Trending projects will be populated here -->
+        </div>
+    </div>
+    
+    <div class="response" id="response">
+        <h2 id="projects-title">المشاريع:</h2>
+        <div id="projects-list"></div>
+        <div class="pagination" id="pagination-container">
+            <button id="prev-page" disabled>السابق</button>
+            <span id="current-page">1</span>
+            <button id="next-page">التالي</button>
+        </div>
+        <p id="no-results" class="no-results" style="display: none;">لا توجد نتائج.</p>
+    </div>
+
+    <div id="project-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <div id="modal-body">
+                <!-- Modal content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Background Script -->
+    <script src="matrix_background.js"></script>
+    <!-- GitHub API Service -->
+    <script src="github_api_service.js"></script>
+    <!-- User Interaction Manager -->
+    <script src="user_interaction.js"></script>
+    <!-- Visual Effects Manager -->
+    <script src="visual_effects.js"></script>
+
+    <script>
+        // Initialize Matrix Background
+        let matrixBackground;
+        let githubApiService;
+        let userInteractionManager;
+        let visualEffectsManager;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Matrix Background
+            matrixBackground = new MatrixBackground({
+                fontSize: 14,
+                color: '#8B0000', // Dark blood red
+                glowColor: '#FF0000', // Bright blood red for glow effect
+                backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                speed: 1.5,
+                density: 0.8,
+                glitchRate: 0.05,
+                characters: '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン',
+                pulseEffect: true,
+                bloodDrops: true,
+                bloodDropRate: 0.01
+            });
+            matrixBackground.start();
+            
+            // Initialize GitHub API Service
+            githubApiService = new GitHubApiService();
+            
+            // Initialize User Interaction Manager
+            userInteractionManager = new UserInteractionManager();
+            userInteractionManager.init();
+            
+            // Initialize Visual Effects Manager
+            visualEffectsManager = new VisualEffectsManager();
+            visualEffectsManager.init();
+            
+            // Show welcome notification
+            setTimeout(() => {
+                userInteractionManager.showNotification('مرحبًا بك في مستكشف مشاريع GitHub المطور!', 'info', 5000);
+            }, 1000);
+            
+            // Initialize app
+            initializeApp();
+        });
+
+        let currentLanguage = 'ar';
+        let currentPage = 1;
+        let perPage = 10;
+        let totalPages = 1;
+        let currentProjectDetails = null;
+        let globalStats = {
+            totalRepositories: 0,
+            totalLanguages: 0,
+            averageStars: 0,
+            topLanguage: ''
+        };
+        let trendingProjects = [];
+        let lastSearchResults = [];
+
+        function initializeApp() {
+            loadLanguages();
+            fetchTrendingProjects();
+            updateStatsDisplay();
+            
+            // Add event listeners
+            document.getElementById("prev-page").addEventListener("click", () => {
+                if (currentPage > 1) {
+                    searchProjects(currentPage - 1);
+                }
+            });
+            
+            document.getElementById("next-page").addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    searchProjects(currentPage + 1);
+                }
+            });
+            
+            // Add keyboard shortcut for search
+            document.getElementById("query").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    searchProjects();
+                }
+            });
+            
+            // Add click effects
+            document.addEventListener('click', function(e) {
+                // Create blood splatter effect on click
+                if (Math.random() > 0.7) {
+                    visualEffectsManager.applyBloodSplatterEffect(e.clientX, e.clientY);
+                }
+            });
+            
+            // Add glitch effect to title
+            const title = document.getElementById('title');
+            setInterval(() => {
+                if (Math.random() > 0.95) {
+                    title.style.textShadow = '2px 2px #ff0000, -2px -2px #00ffff';
+                    setTimeout(() => {
+                        title.style.textShadow = '0 0 5px var(--text-color)';
+                    }, 100);
+                }
+            }, 500);
+        }
+
+        function updateThemeVars() {
+            const theme = document.body.getAttribute('data-theme') || 'dark';
+
+            // التحويل إلى RGB لكل لون
+            function hexToRgb(hex) {
+                const shorthand = hex.length === 4;
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+                    shorthand ? hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3] : hex
+                );
+                return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
+            }
+
+            // تحديث المتغيرات بناءً على الثيم
+            const updateVar = (varName) => {
+                let color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+                if(color.startsWith('#')){
+                    const rgbColor = hexToRgb(color);
+                    if (rgbColor) {
+                        document.documentElement.style.setProperty(`${varName}-rgb`, rgbColor);
+                    }
+                }
+            }
+                
+            updateVar('--text-color');
+            updateVar('--button-color');
+            updateVar('--button-hover-color');
+            updateVar('--input-focus-border-color');
+        }
+
+        // تهيئة الثيم عند التحميل
+        document.addEventListener('DOMContentLoaded', updateThemeVars);
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute("data-theme");
+            const newTheme = currentTheme === "light" ? "dark" : "light";
+            document.body.setAttribute("data-theme", newTheme);
+            updateThemeVars();
+            
+            // Show notification
+            userInteractionManager.showNotification(
+                currentLanguage === 'ar' ? 'تم تغيير الوضع' : 'Theme changed',
+                'info'
+            );
+        }
+
+        function toggleLanguage() {
+            const titleElement = document.getElementById("title");
+            const searchLabelElement = document.getElementById("search-label");
+            const searchButtonElement = document.getElementById("search-button");
+            const projectsTitleElement = document.getElementById("projects-title");
+            const languageButton = document.querySelector('.toggle-language');
+            const trendingTitleElement = document.getElementById("trending-title");
+            const loadingDiv = document.getElementById("loading");
+            
+            if (currentLanguage === 'ar') {
+                currentLanguage = 'en';
+                titleElement.innerText = "GitHub Projects Explorer";
+                titleElement.setAttribute('data-text', "GitHub Projects Explorer");
+                searchLabelElement.innerText = "Enter your query to search for projects:";
+                searchButtonElement.innerText = "Search";
+                projectsTitleElement.innerText = "Projects:";
+                trendingTitleElement.innerText = "Trending Projects";
+                loadingDiv.innerText = "Searching...";
+                languageButton.innerText = "تبديل اللغة";
+                document.body.dir = 'ltr';
+                
+                // Update stats labels
+                updateStatsDisplay();
+                
+                // Update trending projects labels
+                updateTrendingProjects();
+                
+                // Show notification
+                userInteractionManager.showNotification('Language changed to English', 'info');
+                
+            } else {
+                currentLanguage = 'ar';
+                titleElement.innerText = "مستكشف مشاريع GitHub";
+                titleElement.setAttribute('data-text', "مستكشف مشاريع GitHub");
+                searchLabelElement.innerText = "أدخل استفسارك للبحث عن المشاريع:";
+                searchButtonElement.innerText = "بحث";
+                projectsTitleElement.innerText = "المشاريع:";
+                trendingTitleElement.innerText = "المشاريع الشائعة";
+                loadingDiv.innerText = "جاري البحث...";
+                languageButton.innerText = "Switch Language";
+                document.body.dir = 'rtl';
+                
+                // Update stats labels
+                updateStatsDisplay();
+                
+                // Update trending projects labels
+                updateTrendingProjects();
+                
+                // Show notification
+                userInteractionManager.showNotification('تم تغيير اللغة إلى العربية', 'info');
+            }
+            
+            // Re-render any existing search results
+            if (document.getElementById("projects-list").children.length > 0) {
+                renderProjects(lastSearchResults || []);
+            }
+        }
+
+        async function loadLanguages() {
+            const languages = ['JavaScript', 'Python', 'Java', 'PHP', 'Ruby', 'C#', 'Go', 'TypeScript', 'Swift', 'Kotlin', 'HTML', 'CSS', 'C++', 'C', 'Rust', 'Dart', 'Shell', 'Scala', 'R', 'Lua'];
+            const languageSelect = document.getElementById("language-filter");
+            languages.forEach(lang => {
+                const option = document.createElement("option");
+                option.value = lang;
+                option.innerText = lang;
+                languageSelect.appendChild(option);
+            });
+        }
+
+        function openModal(project) {
+            const modal = document.getElementById("project-modal");
+            const modalBody = document.getElementById("modal-body");
+            const createdAt = new Date(project.created_at).toLocaleDateString();
+            const updatedAt = new Date(project.updated_at).toLocaleDateString();
+            currentProjectDetails = project;
+            
+            modalBody.innerHTML = `
+                <h2>${project.name}</h2>
+                <p><strong>${currentLanguage === 'ar' ? 'الوصف:' : 'Description:'}</strong> ${project.description || (currentLanguage === 'ar' ? 'لا يوجد وصف' : 'No description')}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'اللغة البرمجية:' : 'Language:'}</strong> ${project.language || (currentLanguage === 'ar' ? 'غير محدد' : 'Not specified')}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'عدد النجوم:' : 'Stars:'}</strong> ${project.stargazers_count.toLocaleString()}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'عدد الفروع:' : 'Forks:'}</strong> ${project.forks_count.toLocaleString()}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'عدد المشاكل المفتوحة:' : 'Open Issues:'}</strong> ${project.open_issues_count.toLocaleString()}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'تاريخ النشر:' : 'Created at:'}</strong> ${createdAt}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'آخر تعديل:' : 'Updated at:'}</strong> ${updatedAt}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'المطور:' : 'Author:'}</strong> <a href="https://github.com/${project.owner.login}" target="_blank">${project.owner.login}</a></p>
+                <p><strong>${currentLanguage === 'ar' ? 'رابط المشروع:' : 'Project Link:'}</strong> <a href="${project.html_url}" target="_blank">${project.name}</a></p>
+                <p><strong>${currentLanguage === 'ar' ? 'الحجم:' : 'Size:'}</strong> ${(project.size / 1024).toFixed(2)} MB</p>
+                <p><strong>${currentLanguage === 'ar' ? 'المشاهدات:' : 'Watchers:'}</strong> ${project.watchers_count.toLocaleString()}</p>
+                <p><strong>${currentLanguage === 'ar' ? 'الفرع الافتراضي:' : 'Default Branch:'}</strong> ${project.default_branch}</p>
+                <a href="${project.html_url}/archive/refs/heads/${project.default_branch}.zip" class="download-button" target="_blank">${currentLanguage === 'ar' ? 'تحميل المشروع' : 'Download Project'}</a>
+                <a href="${project.html_url}/issues" class="download-button" style="margin-right: 10px;" target="_blank">${currentLanguage === 'ar' ? 'عرض المشاكل' : 'View Issues'}</a>
+            `;
+
+            modal.style.display = "block";
+            
+            // Apply text scramble effect to modal title
+            const modalTitle = modalBody.querySelector('h2');
+            visualEffectsManager.applyTextScrambleEffect(modalTitle, project.name);
+
+            document.querySelector('.modal .close').onclick = function() {
+                modal.style.display = "none";
+            };
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+
+        function renderProjects(projects) {
+            const projectsListDiv = document.getElementById("projects-list");
+            projectsListDiv.innerHTML = "";
+
+            projects.forEach(project => {
+                const projectDiv = document.createElement("div");
+                projectDiv.classList.add("project");
+                const createdAt = new Date(project.created_at).toLocaleDateString();
+                const updatedAt = new Date(project.updated_at).toLocaleDateString();
+
+                projectDiv.innerHTML = `
+                    <div class="project-container">
+                        <img src="${project.owner.avatar_url}" class="project-img" alt="${project.name}">
+                        <div>
+                            <h3>${project.name} <i class="fab fa-github"></i></h3>
+                            <div class="details">
+                                <p><strong>${currentLanguage === 'ar' ? 'الوصف:' : 'Description:'}</strong> ${project.description || (currentLanguage === 'ar' ? 'لا يوجد وصف' : 'No description')}</p>
+                                <p><strong>${currentLanguage === 'ar' ? 'اللغة البرمجية:' : 'Language:'}</strong> ${project.language || (currentLanguage === 'ar' ? 'غير محدد' : 'Not specified')}</p>
+                                <p><strong>${currentLanguage === 'ar' ? 'عدد النجوم:' : 'Stars:'}</strong> ${project.stargazers_count.toLocaleString()}</p>
+                                <p><strong>${currentLanguage === 'ar' ? 'آخر تعديل:' : 'Updated:'}</strong> ${updatedAt}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                projectDiv.addEventListener('click', () => openModal(project));
+                projectsListDiv.appendChild(projectDiv);
+            });
+        }
+
+        async function searchProjects(newPage = 1) {
+            currentPage = newPage;
+            const query = document.getElementById("query").value;
+            const languageFilter = document.getElementById("language-filter").value;
+            const starsFilter = document.getElementById("stars-filter").value;
+            const sortFilter = document.getElementById("sort-filter").value;
+            const orderFilter = document.getElementById("order-filter").value;
+            const responseDiv = document.getElementById("response");
+            const projectsListDiv = document.getElementById("projects-list");
+            const loadingDiv = document.getElementById("loading");
+            const noResultsDiv = document.getElementById("no-results");
+
+            if (!query) {
+                userInteractionManager.showNotification(
+                    currentLanguage === 'ar' ? "الرجاء إدخال استفسار." : "Please enter a query.",
+                    'warning'
+                );
+                return;
+            }
+
+            loadingDiv.style.display = 'block';
+            responseDiv.style.display = 'none';
+            noResultsDiv.style.display = 'none';
+            
+            // Show searching notification
+            userInteractionManager.showNotification(
+                currentLanguage === 'ar' ? "جاري البحث..." : "Searching...",
+                'info',
+                2000
+            );
+
+            try {
+                // Use the GitHub API Service
+                const data = await githubApiService.searchRepositories({
+                    query: query,
+                    language: languageFilter,
+                    minStars: starsFilter,
+                    sort: sortFilter,
+                    order: orderFilter,
+                    page: currentPage,
+                    perPage: perPage
+                });
+                
+                const projects = data.items || [];
+                lastSearchResults = projects;
+
+                if (projects.length === 0) {
+                    loadingDiv.style.display = 'none';
+                    noResultsDiv.style.display = 'block';
+                    responseDiv.style.display = 'block';
+                    projectsListDiv.innerHTML = "";
+                    
+                    userInteractionManager.showNotification(
+                        currentLanguage === 'ar' ? "لا توجد نتائج." : "No results found.",
+                        'warning'
+                    );
+                    return;
+                }
+
+                renderProjects(projects);
+
+                // Update pagination
+                const paginationContainer = document.getElementById("pagination-container");
+                totalPages = Math.ceil(data.total_count / perPage);
+                const prevButton = document.getElementById("prev-page");
+                const nextButton = document.getElementById("next-page");
+                const currentPageSpan = document.getElementById("current-page");
+
+                currentPageSpan.innerText = currentPage;
+                if (currentPage === 1) {
+                    prevButton.disabled = true;
+                } else {
+                    prevButton.disabled = false;
+                }
+
+                if(currentPage === totalPages || totalPages === 0){
+                    nextButton.disabled = true;
+                } else {
+                    nextButton.disabled = false;
+                }
+
+                responseDiv.style.display = 'block';
+                loadingDiv.style.display = 'none';
+
+                // Update global stats
+                updateGlobalStats(data);
+                
+                // Show success notification
+                userInteractionManager.showNotification(
+                    currentLanguage === 'ar' 
+                        ? `تم العثور على ${data.total_count} مشروع` 
+                        : `Found ${data.total_count} projects`,
+                    'success'
+                );
+
+            } catch (error) {
+                userInteractionManager.showNotification(
+                    currentLanguage === 'ar' 
+                        ? "حدث خطأ أثناء الاتصال بـ GitHub." 
+                        : "An error occurred while connecting to GitHub.",
+                    'error'
+                );
+                console.error(error);
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        function updateGlobalStats(data) {
+            if (!data || !data.items) return;
+            
+            const languages = {};
+            let totalStars = 0;
+            
+            data.items.forEach(repo => {
+                totalStars += repo.stargazers_count;
+                if (repo.language) {
+                    languages[repo.language] = (languages[repo.language] || 0) + 1;
+                }
+            });
+            
+            let topLanguage = '';
+            let maxCount = 0;
+            
+            for (const lang in languages) {
+                if (languages[lang] > maxCount) {
+                    maxCount = languages[lang];
+                    topLanguage = lang;
+                }
+            }
+            
+            globalStats = {
+                totalRepositories: data.total_count,
+                totalLanguages: Object.keys(languages).length,
+                averageStars: data.items.length > 0 ? totalStars / data.items.length : 0,
+                topLanguage: topLanguage
+            };
+            
+            updateStatsDisplay();
+        }
+        
+        function updateStatsDisplay() {
+            const statsContainer = document.getElementById('stats-container');
+            
+            statsContainer.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-value">${globalStats.totalRepositories.toLocaleString()}</div>
+                    <div class="stat-label">${currentLanguage === 'ar' ? 'إجمالي المشاريع' : 'Total Repositories'}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${globalStats.totalLanguages}</div>
+                    <div class="stat-label">${currentLanguage === 'ar' ? 'اللغات المستخدمة' : 'Languages Used'}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${Math.round(globalStats.averageStars).toLocaleString()}</div>
+                    <div class="stat-label">${currentLanguage === 'ar' ? 'متوسط النجوم' : 'Average Stars'}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${globalStats.topLanguage || '-'}</div>
+                    <div class="stat-label">${currentLanguage === 'ar' ? 'اللغة الأكثر استخدامًا' : 'Top Language'}</div>
+                </div>
+            `;
+        }
+        
+        async function fetchTrendingProjects() {
+            try {
+                // Use the GitHub API Service
+                const data = await githubApiService.getTrendingRepositories({
+                    since: '7days',
+                    limit: 10
+                });
+                
+                if (data && data.items) {
+                    trendingProjects = data.items;
+                    updateTrendingProjects();
+                }
+            } catch (error) {
+                console.error('Error fetching trending projects:', error);
+                userInteractionManager.showNotification(
+                    currentLanguage === 'ar' 
+                        ? "حدث خطأ أثناء جلب المشاريع الشائعة." 
+                        : "Error fetching trending projects.",
+                    'error'
+                );
+            }
+        }
+        
+        function updateTrendingProjects() {
+            const trendingList = document.getElementById('trending-list');
+            if (!trendingList || !trendingProjects.length) return;
+            
+            trendingList.innerHTML = '';
+            
+            trendingProjects.forEach(project => {
+                const trendingItem = document.createElement('div');
+                trendingItem.className = 'trending-item';
+                trendingItem.innerHTML = `
+                    <div class="trending-name">${project.name}</div>
+                    <div>${project.language || (currentLanguage === 'ar' ? 'غير محدد' : 'Not specified')}</div>
+                    <div class="trending-stars">
+                        <i class="fas fa-star" style="color: gold;"></i>
+                        ${project.stargazers_count.toLocaleString()}
+                    </div>
+                `;
+                
+                trendingItem.addEventListener('click', () => openModal(project));
+                trendingList.appendChild(trendingItem);
+            });
+        }
+    </script>
+</body>
+</html>
